@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Lista de Compras Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        --bg-main-light: #f3f4f6; /* cinza claro neutro */
+        --bg-card-light: #ffffff;
+        --accent-orange: #f97316;
+        --accent-yellow: #facc15;
+        --accent-turquoise: #06b6d4;
+        --accent-green: #22c55e;
+        --accent-red: #ef4444;
+        --accent-indigo: #6366f1;
+        --text-main-light: #111827;
+        --text-muted-light: #4b5563;
+
+        --bg-main-dark: #020617;
+        --bg-card-dark: #0f172a;
+        --text-main-dark: #e5e7eb;
+        --text-muted-dark: #9ca3af;
+
+        --radius-lg: 16px;
+        --radius-md: 12px;
+      }
+
+      html[data-theme="light"] {
+        --bg-main: var(--bg-main-light);
+        --bg-card: var(--bg-card-light);
+        --text-main: var(--text-main-light);
+        --text-muted: var(--text-muted-light);
+      }
+
+      html[data-theme="dark"] {
+        --bg-main: var(--bg-main-dark);
+        --bg-card: var(--bg-card-dark);
+        --text-main: var(--text-main-dark);
+        --text-muted: var(--text-muted-dark);
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background:
+          radial-gradient(circle at top, rgba(34, 197, 94, 0.10), transparent 55%),
+          radial-gradient(circle at bottom, rgba(6, 182, 212, 0.10), transparent 55%),
+          var(--bg-main);
+        color: var(--text-main);
+      }
+
+      .app {
+        max-width: 420px;
+        margin: 16px auto 32px;
+        padding: 16px;
+      }
+
+      .card {
+        background: var(--bg-card);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .header-title {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .chip {
+        font-size: 0.75rem;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-orange),
+          var(--accent-yellow)
+        );
+        color: #111827;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 1.35rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-turquoise),
+          var(--accent-indigo)
+        );
+      }
+
+      .theme-toggle {
+        border-radius: 999px;
+        padding: 4px 8px;
+        border: 1px solid rgba(148, 163, 184, 0.6);
+        background: radial-gradient(circle, #06b6d430, transparent 55%);
+        color: var(--text-main);
+        font-size: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 12px;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 6px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      input[type="text"],
+      input[type="number"],
+      select {
+        padding: 6px 8px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        outline: none;
+        background: rgba(15, 23, 42, 0.02);
+        color: var(--text-main);
+        font-size: 0.8rem;
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(148, 163, 184, 0.9);
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      select:focus {
+        border-color: var(--accent-turquoise);
+        box-shadow: 0 0 0 1px var(--accent-turquoise);
+        background: rgba(15, 23, 42, 0.04);
+      }
+
+      #item-quantidade,
+      #item-preco {
+        font-size: 0.8rem;
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      button {
+        border: none;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        padding: 8px 10px;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      #btn-adicionar {
+        background: linear-gradient(
+          135deg,
+          var(--accent-green),
+          var(--accent-turquoise)
+        );
+        color: #ecfdf5;
+        box-shadow: 0 10px 20px rgba(34, 197, 94, 0.4);
+      }
+
+      #btn-adicionar:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      .lista-container {
+        margin-top: 14px;
+      }
+
+      .lista-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+
+      .lista-header h2 {
+        margin: 0;
+        font-size: 1rem;
+      }
+
+      .filtros {
+        display: flex;
+        gap: 4px;
+      }
+
+      .chip-filtro {
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        border: 1px solid rgba(148, 163, 184, 0.7);
+        background: rgba(15, 23, 42, 0.03);
+        color: var(--text-muted);
+      }
+
+      .chip-filtro.ativo {
+        border-color: var(--accent-turquoise);
+        color: var(--accent-turquoise);
+        background: rgba(8, 145, 178, 0.09);
+      }
+
+      .lista {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 50vh;
+        overflow-y: auto;
+        scrollbar-width: thin;
+      }
+
+      .lista-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 10px;
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.02);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        margin-bottom: 6px;
+      }
+
+      .lista-item.comprado {
+        background: rgba(22, 163, 74, 0.1);
+        border-color: rgba(22, 163, 74, 0.6);
+        color: #22c55e;
+      }
+
+      .item-esquerda {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .item-esquerda span.nome {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 120px;
+      }
+
+      .item-direita {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 4px;
+      }
+
+      .badge-quantidade {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(249, 115, 22, 0.1);
+        color: var(--accent-orange);
+      }
+
+      .badge-preco {
+        font-size: 0.7rem;
+        padding: 2px 6px;
+        border-radius: 999px;
+        background: rgba(250, 204, 21, 0.12);
+        color: var(--accent-yellow);
+      }
+
+      .btn-pequeno {
+        padding: 4px 6px;
+        font-size: 0.7rem;
+      }
+
+      .btn-remover {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--accent-red);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+      }
+
+      .btn-toggle {
+        background: rgba(56, 189, 248, 0.2);
+        color: var(--accent-turquoise);
+        border: 1px solid rgba(56, 189, 248, 0.7);
+      }
+
+      .btn-editar {
+        background: rgba(99, 102, 241, 0.12);
+        color: var(--accent-indigo);
+        border: 1px solid rgba(99, 102, 241, 0.6);
+      }
+
+      .mensagem-vazia {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+      }
+
+      .rodape {
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        font-size: 0.8rem;
+      }
+
+      .rodape-linha {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .resumo-info {
+        color: var(--text-muted);
+      }
+
+      .acoes-resumo {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .btn-texto {
+        background: transparent;
+        border: 1px dashed rgba(148, 163, 184, 0.7);
+        color: var(--text-muted);
+      }
+
+      .btn-total {
+        background: linear-gradient(
+          135deg,
+          var(--accent-yellow),
+          var(--accent-orange)
+        );
+        color: #111827;
+      }
+
+      .texto-total {
+        font-weight: 600;
+        color: var(--accent-green);
+      }
+
+      .importacao {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .importacao input[type="file"] {
+        font-size: 0.75rem;
+      }
+
+      @media (max-width: 360px) {
+        .form-row {
+          flex-direction: column;
+        }
+      }
+
+      @media print {
+        body {
+          background: #ffffff;
+        }
+        .app {
+          box-shadow: none;
+          margin: 0;
+        }
+        .header,
+        .form,
+        .rodape .acoes-resumo,
+        .importacao {
+          display: none !important;
+        }
+        .lista {
+          max-height: none;
+          overflow: visible;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="card">
+        <header class="header">
+          <div class="header-title">
+            <div class="chip">
+              <span class="dot"></span>
+              Lista de Compras
+            </div>
+            <h1>
+              Mobile
+              <span
+                style="
+                  font-size: 0.75rem;
+                  font-weight: 500;
+                  color: var(--text-muted);
+                "
+                >organize tudo na mão</span
+              >
+            </h1>
+          </div>
+          <button id="btn-theme" class="theme-toggle">
+            <span>🌞</span> <span>Claro</span>
+          </button>
+        </header>
+
+        <form id="form-compra" class="form">
+          <div class="form-group">
+            <label for="item-nome">Item</label>
+            <input
+              type="text"
+              id="item-nome"
+              placeholder="Ex.: Arroz integral"
+              autocomplete="off"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="item-quantidade">Quantidade</label>
+              <input type="number" id="item-quantidade" min="1" value="1" />
+            </div>
+
+            <div class="form-group">
+              <label for="item-preco">Preço (R$)</label>
+              <input
+                type="number"
+                id="item-preco"
+                min="0"
+                step="0.01"
+                value="0"
+              />
+            </div>
+          </div>
+
+          <button type="submit" id="btn-adicionar">Adicionar item</button>
+        </form>
+
+        <section class="lista-container">
+          <div class="lista-header">
+            <h2>Itens</h2>
+            <div class="filtros">
+              <button
+                class="chip-filtro ativo"
+                data-filtro="todos"
+                type="button"
+              >
+                Todos
+              </button>
+              <button
+                class="chip-filtro"
+                data-filtro="pendentes"
+                type="button"
+              >
+                Pendentes
+              </button>
+              <button
+                class="chip-filtro"
+                data-filtro="comprados"
+                type="button"
+              >
+                Comprados
+              </button>
+            </div>
+          </div>
+
+          <select id="ordenacao">
+            <option value="data-desc">Mais recentes</option>
+            <option value="nome-asc">Nome (A-Z)</option>
+            <option value="nome-desc">Nome (Z-A)</option>
+            <option value="qtd-asc">Quantidade (↑)</option>
+            <option value="qtd-desc">Quantidade (↓)</option>
+            <option value="preco-asc">Preço (↑)</option>
+            <option value="preco-desc">Preço (↓)</option>
+          </select>
+
+          <ul id="lista-itens" class="lista"></ul>
+          <p id="mensagem-vazia" class="mensagem-vazia">
+            Nenhum item ainda. Comece adicionando algo acima.
+          </p>
+        </section>
+
+        <section class="rodape">
+          <div class="rodape-linha">
+            <span id="texto-resumo" class="resumo-info">
+              0 itens (0 pendentes, 0 comprados)
+            </span>
+            <div class="acoes-resumo">
+              <button id="btn-limpar-comprados" class="btn-texto" type="button">
+                Limpar comprados
+              </button>
+              <button id="btn-exportar-pdf" class="btn-texto" type="button">
+                Exportar PDF
+              </button>
+            </div>
+          </div>
+
+          <div class="rodape-linha">
+            <button
+              id="btn-calcular-total"
+              class="btn-total"
+              type="button"
+            >
+              Total dos pendentes
+            </button>
+            <span id="texto-total" class="texto-total"></span>
+          </div>
+
+          <div class="importacao">
+            <span>Importar lista JSON (nome, quantidade, preco, comprado)</span>
+            <input type="file" id="input-importar" accept=".json" />
+            <button id="btn-importar" class="btn-texto" type="button">
+              Importar JSON
+            </button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script>
+      const STORAGE_KEY = "lista-compras-mobile";
+
+      /**
+       * @typedef {{id:number;nome:string;quantidade:number;preco:number;comprado:boolean;criadoEm:string;}} ItemLista
+       */
+
+      /** @type {ItemLista[]} */
+      let itens = [];
+
+      const form = document.getElementById("form-compra");
+      const inputNome = document.getElementById("item-nome");
+      const inputQuantidade = document.getElementById("item-quantidade");
+      const inputPreco = document.getElementById("item-preco");
+      const btnAdicionar = document.getElementById("btn-adicionar");
+      const listaElement = document.getElementById("lista-itens");
+      const mensagemVazia = document.getElementById("mensagem-vazia");
+      const ordenacao = document.getElementById("ordenacao");
+      const textoResumo = document.getElementById("texto-resumo");
+      const btnLimparComprados = document.getElementById(
+        "btn-limpar-comprados"
+      );
+      const btnCalcularTotal = document.getElementById("btn-calcular-total");
+      const textoTotal = document.getElementById("texto-total");
+      const inputImportar = document.getElementById("input-importar");
+      const btnImportar = document.getElementById("btn-importar");
+      const btnExportarPDF = document.getElementById("btn-exportar-pdf");
+      const filtroChips = Array.from(
+        document.querySelectorAll(".chip-filtro")
+      );
+      const btnTheme = document.getElementById("btn-theme");
+
+      let filtroAtual = "todos";
+
+      function salvarNoStorage() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(itens));
+      }
+
+      function carregarDoStorage() {
+        const bruto = localStorage.getItem(STORAGE_KEY);
+        if (!bruto) {
+          itens = [];
+          return;
+        }
+        try {
+          const dados = JSON.parse(bruto);
+          itens = Array.isArray(dados) ? dados : [];
+        } catch {
+          itens = [];
+        }
+      }
+
+      function aplicarFiltroEOrdenacao(lista) {
+        let resultado = [...lista];
+
+        if (filtroAtual === "pendentes") {
+          resultado = resultado.filter((i) => !i.comprado);
+        } else if (filtroAtual === "comprados") {
+          resultado = resultado.filter((i) => i.comprado);
+        }
+
+        const ord = ordenacao.value;
+        resultado.sort((a, b) => {
+          switch (ord) {
+            case "nome-asc":
+              return a.nome.localeCompare(b.nome);
+            case "nome-desc":
+              return b.nome.localeCompare(a.nome);
+            case "qtd-asc":
+              return a.quantidade - b.quantidade;
+            case "qtd-desc":
+              return b.quantidade - a.quantidade;
+            case "preco-asc":
+              return a.preco - b.preco;
+            case "preco-desc":
+              return b.preco - a.preco;
+            case "data-asc":
+              return new Date(a.criadoEm) - new Date(b.criadoEm);
+            case "data-desc":
+              return new Date(b.criadoEm) - new Date(a.criadoEm);
+            default:
+              return 0;
+          }
+        });
+
+        return resultado;
+      }
+
+      function atualizarResumo() {
+        const total = itens.length;
+        const comprados = itens.filter((i) => i.comprado).length;
+        const pendentes = total - comprados;
+        textoResumo.textContent = `${total} itens (${pendentes} pendentes, ${comprados} comprados)`;
+      }
+
+      function renderizarLista() {
+        listaElement.innerHTML = "";
+
+        const visiveis = aplicarFiltroEOrdenacao(itens);
+
+        mensagemVazia.style.display = visiveis.length ? "none" : "block";
+
+        visiveis.forEach((item) => {
+          const li = document.createElement("li");
+          li.className = "lista-item";
+          if (item.comprado) li.classList.add("comprado");
+
+          const esquerda = document.createElement("div");
+          esquerda.className = "item-esquerda";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = item.comprado;
+          checkbox.addEventListener("change", () => {
+            toggleComprado(item.id);
+          });
+
+          const spanNome = document.createElement("span");
+          spanNome.className = "nome";
+          spanNome.textContent = item.nome;
+
+          const badgeQtd = document.createElement("span");
+          badgeQtd.className = "badge-quantidade";
+          badgeQtd.textContent = `x${item.quantidade}`;
+
+          const badgePreco = document.createElement("span");
+          badgePreco.className = "badge-preco";
+          badgePreco.textContent = `R$ ${item.preco.toFixed(2)}`;
+
+          esquerda.appendChild(checkbox);
+          esquerda.appendChild(spanNome);
+          esquerda.appendChild(badgeQtd);
+          esquerda.appendChild(badgePreco);
+
+          const direita = document.createElement("div");
+          direita.className = "item-direita";
+
+          const btnEditar = document.createElement("button");
+          btnEditar.type = "button";
+          btnEditar.className = "btn-pequeno btn-editar";
+          btnEditar.textContent = "Editar";
+          btnEditar.addEventListener("click", () => {
+            editarItemInline(item.id);
+          });
+
+          const btnToggle = document.createElement("button");
+          btnToggle.type = "button";
+          btnToggle.className = "btn-pequeno btn-toggle";
+          btnToggle.textContent = item.comprado ? "Desm." : "Comprar";
+          btnToggle.addEventListener("click", () => {
+            toggleComprado(item.id);
+          });
+
+          const btnRemover = document.createElement("button");
+          btnRemover.type = "button";
+          btnRemover.className = "btn-pequeno btn-remover";
+          btnRemover.textContent = "X";
+          btnRemover.addEventListener("click", () => {
+            removerItem(item.id);
+          });
+
+          direita.appendChild(btnEditar);
+          direita.appendChild(btnToggle);
+          direita.appendChild(btnRemover);
+
+          li.appendChild(esquerda);
+          li.appendChild(direita);
+
+          listaElement.appendChild(li);
+        });
+
+        atualizarResumo();
+      }
+
+      function adicionarItem(nome, quantidade, preco) {
+        const novoItem = {
+          id: Date.now() + Math.random(),
+          nome,
+          quantidade,
+          preco,
+          comprado: false,
+          criadoEm: new Date().toISOString(),
+        };
+        itens.push(novoItem);
+        salvarNoStorage();
+        renderizarLista();
+      }
+
+      function toggleComprado(id) {
+        itens = itens.map((item) =>
+          item.id === id ? { ...item, comprado: !item.comprado } : item
+        );
+        salvarNoStorage();
+        renderizarLista();
+      }
+
+      function removerItem(id) {
+        itens = itens.filter((item) => item.id !== id);
+        salvarNoStorage();
+        renderizarLista();
+      }
+
+      function editarItemInline(id) {
+        const item = itens.find((i) => i.id === id);
+        if (!item) return;
+
+        const novoNome = prompt("Novo nome do item:", item.nome);
+        if (novoNome === null) return;
+        const novoNomeTrim = novoNome.trim();
+        if (!novoNomeTrim) return;
+
+        const novaQtdStr = prompt(
+          "Nova quantidade:",
+          String(item.quantidade)
+        );
+        if (novaQtdStr === null) return;
+        const novaQtd = Number(novaQtdStr);
+        if (Number.isNaN(novaQtd) || novaQtd < 1) return;
+
+        const novoPrecoStr = prompt(
+          "Novo preço (R$):",
+          item.preco.toFixed(2)
+        );
+        if (novoPrecoStr === null) return;
+        const novoPreco = Number(novoPrecoStr.replace(",", "."));
+        if (Number.isNaN(novoPreco) || novoPreco < 0) return;
+
+        itens = itens.map((i) =>
+          i.id === id
+            ? {
+                ...i,
+                nome: novoNomeTrim,
+                quantidade: novaQtd,
+                preco: novoPreco,
+              }
+            : i
+        );
+        salvarNoStorage();
+        renderizarLista();
+      }
+
+      function atualizarEstadoBotao() {
+        const nomeValido = inputNome.value.trim().length > 0;
+        const qtd = Number(inputQuantidade.value);
+        const qtdValida = !Number.isNaN(qtd) && qtd >= 1;
+        const preco = Number(inputPreco.value);
+        const precoValido = !Number.isNaN(preco) && preco >= 0;
+
+        btnAdicionar.disabled = !(nomeValido && qtdValida && precoValido);
+      }
+
+      function limparComprados() {
+        if (!confirm("Remover todos os itens marcados como comprados?")) return;
+        itens = itens.filter((i) => !i.comprado);
+        salvarNoStorage();
+        renderizarLista();
+        textoTotal.textContent = "";
+      }
+
+      function calcularTotalPendentes() {
+        if (
+          !confirm(
+            "Calcular o total apenas dos itens pendentes? (preços x quantidades)"
+          )
+        )
+          return;
+        const total = itens
+          .filter((i) => !i.comprado)
+          .reduce((acc, i) => acc + i.preco * i.quantidade, 0);
+        textoTotal.textContent = `R$ ${total.toFixed(2)}`;
+      }
+
+      function importarJSON() {
+        if (!inputImportar.files || inputImportar.files.length === 0) {
+          alert("Selecione um arquivo JSON primeiro.");
+          return;
+        }
+
+        const arquivo = inputImportar.files[0];
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          try {
+            const conteudo = reader.result;
+            const dados = JSON.parse(conteudo);
+
+            if (!Array.isArray(dados)) {
+              alert("Formato inválido: esperado um array de itens.");
+              return;
+            }
+
+            const novos = dados
+              .map((raw) => {
+                const nome = String(raw.nome || "").trim();
+                const quantidade = Number(raw.quantidade ?? 1);
+                const preco = Number(raw.preco ?? 0);
+                const comprado = Boolean(raw.comprado);
+
+                if (!nome || Number.isNaN(quantidade) || quantidade < 1) {
+                  return null;
+                }
+
+                return {
+                  id: Date.now() + Math.random(),
+                  nome,
+                  quantidade,
+                  preco:
+                    Number.isNaN(preco) || preco < 0 ? 0 : preco,
+                  comprado,
+                  criadoEm: new Date().toISOString(),
+                };
+              })
+              .filter((x) => x !== null);
+
+            if (novos.length === 0) {
+              alert("Nenhum item válido encontrado no arquivo.");
+              return;
+            }
+
+            const substituir = confirm(
+              "Deseja substituir a lista atual pelos itens importados? (OK = substituir, Cancelar = adicionar aos existentes)"
+            );
+
+            if (substituir) {
+              itens = novos;
+            } else {
+              itens = itens.concat(novos);
+            }
+
+            salvarNoStorage();
+            renderizarLista();
+            textoTotal.textContent = "";
+            alert(`Importados ${novos.length} itens.`);
+          } catch (e) {
+            alert("Erro ao ler o arquivo. Verifique se é JSON válido.");
+          }
+        };
+
+        reader.readAsText(arquivo, "utf-8");
+      }
+
+      function alternarTema() {
+        const html = document.documentElement;
+        const temaAtual = html.getAttribute("data-theme") || "light";
+        const novoTema = temaAtual === "light" ? "dark" : "light";
+        html.setAttribute("data-theme", novoTema);
+
+        if (novoTema === "light") {
+          btnTheme.innerHTML = "<span>🌞</span> <span>Claro</span>";
+        } else {
+          btnTheme.innerHTML = "<span>🌙</span> <span>Escuro</span>";
+        }
+      }
+
+      function exportarPDF() {
+        if (!confirm("Gerar versão em PDF da lista atual?")) return;
+        window.print();
+      }
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const nome = inputNome.value.trim();
+        const quantidade = Number(inputQuantidade.value);
+        const preco = Number(inputPreco.value);
+        if (!nome || Number.isNaN(quantidade) || quantidade < 1) return;
+        if (Number.isNaN(preco) || preco < 0) return;
+
+        adicionarItem(nome, quantidade, preco);
+        inputNome.value = "";
+        inputQuantidade.value = "1";
+        inputPreco.value = "0";
+        inputNome.focus();
+        textoTotal.textContent = "";
+        atualizarEstadoBotao();
+      });
+
+      inputNome.addEventListener("input", atualizarEstadoBotao);
+      inputQuantidade.addEventListener("input", atualizarEstadoBotao);
+      inputPreco.addEventListener("input", atualizarEstadoBotao);
+      ordenacao.addEventListener("change", renderizarLista);
+
+      filtroChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          filtroChips.forEach((c) => c.classList.remove("ativo"));
+          chip.classList.add("ativo");
+          filtroAtual = chip.getAttribute("data-filtro") || "todos";
+          renderizarLista();
+        });
+      });
+
+      btnLimparComprados.addEventListener("click", limparComprados);
+      btnCalcularTotal.addEventListener("click", calcularTotalPendentes);
+      btnImportar.addEventListener("click", (e) => {
+        e.preventDefault();
+        importarJSON();
+      });
+      btnExportarPDF.addEventListener("click", exportarPDF);
+      btnTheme.addEventListener("click", alternarTema);
+
+      carregarDoStorage();
+      renderizarLista();
+      atualizarEstadoBotao();
+    </script>
+  </body>
+</html>
+
