@@ -1,971 +1,2060 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
-  <head>
+<html lang="pt-BR" data-theme="dark">
+<head>
     <meta charset="UTF-8" />
-    <title>Lista de Compras Mobile</title>
+    <title>Lista de Compras - Confirmação Personalizada</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-      :root {
-        --bg-main-light: #f3f4f6; /* cinza claro neutro */
-        --bg-card-light: #ffffff;
-        --accent-orange: #f97316;
-        --accent-yellow: #facc15;
-        --accent-turquoise: #06b6d4;
-        --accent-green: #22c55e;
-        --accent-red: #ef4444;
-        --accent-indigo: #6366f1;
-        --text-main-light: #111827;
-        --text-muted-light: #4b5563;
-
-        --bg-main-dark: #020617;
-        --bg-card-dark: #0f172a;
-        --text-main-dark: #e5e7eb;
-        --text-muted-dark: #9ca3af;
-
-        --radius-lg: 16px;
-        --radius-md: 12px;
-      }
-
-      html[data-theme="light"] {
-        --bg-main: var(--bg-main-light);
-        --bg-card: var(--bg-card-light);
-        --text-main: var(--text-main-light);
-        --text-muted: var(--text-muted-light);
-      }
-
-      html[data-theme="dark"] {
-        --bg-main: var(--bg-main-dark);
-        --bg-card: var(--bg-card-dark);
-        --text-main: var(--text-main-dark);
-        --text-muted: var(--text-muted-dark);
-      }
-
-      * {
-        box-sizing: border-box;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-      }
-
-      body {
-        margin: 0;
-        padding: 0;
-        background:
-          radial-gradient(circle at top, rgba(34, 197, 94, 0.10), transparent 55%),
-          radial-gradient(circle at bottom, rgba(6, 182, 212, 0.10), transparent 55%),
-          var(--bg-main);
-        color: var(--text-main);
-      }
-
-      .app {
-        max-width: 420px;
-        margin: 16px auto 32px;
-        padding: 16px;
-      }
-
-      .card {
-        background: var(--bg-card);
-        border-radius: var(--radius-lg);
-        padding: 16px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
-        border: 1px solid rgba(15, 23, 42, 0.08);
-      }
-
-      .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 12px;
-      }
-
-      .header-title {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-      }
-
-      .chip {
-        font-size: 0.75rem;
-        padding: 2px 8px;
-        border-radius: 999px;
-        background: linear-gradient(
-          90deg,
-          var(--accent-orange),
-          var(--accent-yellow)
-        );
-        color: #111827;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      h1 {
-        margin: 0;
-        font-size: 1.35rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 999px;
-        background: linear-gradient(
-          135deg,
-          var(--accent-turquoise),
-          var(--accent-indigo)
-        );
-      }
-
-      .theme-toggle {
-        border-radius: 999px;
-        padding: 4px 8px;
-        border: 1px solid rgba(148, 163, 184, 0.6);
-        background: radial-gradient(circle, #06b6d430, transparent 55%);
-        color: var(--text-main);
-        font-size: 0.8rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .form {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        margin-top: 12px;
-      }
-
-      .form-row {
-        display: flex;
-        gap: 6px;
-      }
-
-      .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        flex: 1 1 0;
-        min-width: 0;
-      }
-
-      label {
-        font-size: 0.75rem;
-        color: var(--text-muted);
-      }
-
-      input[type="text"],
-      input[type="number"],
-      select {
-        padding: 6px 8px;
-        border-radius: 8px;
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        outline: none;
-        background: rgba(15, 23, 42, 0.02);
-        color: var(--text-main);
-        font-size: 0.8rem;
-      }
-
-      input[type="text"]::placeholder {
-        color: rgba(148, 163, 184, 0.9);
-      }
-
-      input[type="text"]:focus,
-      input[type="number"]:focus,
-      select:focus {
-        border-color: var(--accent-turquoise);
-        box-shadow: 0 0 0 1px var(--accent-turquoise);
-        background: rgba(15, 23, 42, 0.04);
-      }
-
-      #item-quantidade,
-      #item-preco {
-        font-size: 0.8rem;
-        flex: 1 1 0;
-        min-width: 0;
-      }
-
-      button {
-        border: none;
-        border-radius: var(--radius-md);
-        cursor: pointer;
-        padding: 8px 10px;
-        font-weight: 600;
-        font-size: 0.85rem;
-      }
-
-      #btn-adicionar {
-        background: linear-gradient(
-          135deg,
-          var(--accent-green),
-          var(--accent-turquoise)
-        );
-        color: #ecfdf5;
-        box-shadow: 0 10px 20px rgba(34, 197, 94, 0.4);
-      }
-
-      #btn-adicionar:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        box-shadow: none;
-      }
-
-      .lista-container {
-        margin-top: 14px;
-      }
-
-      .lista-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 6px;
-      }
-
-      .lista-header h2 {
-        margin: 0;
-        font-size: 1rem;
-      }
-
-      .filtros {
-        display: flex;
-        gap: 4px;
-      }
-
-      .chip-filtro {
-        border-radius: 999px;
-        padding: 4px 8px;
-        font-size: 0.7rem;
-        border: 1px solid rgba(148, 163, 184, 0.7);
-        background: rgba(15, 23, 42, 0.03);
-        color: var(--text-muted);
-      }
-
-      .chip-filtro.ativo {
-        border-color: var(--accent-turquoise);
-        color: var(--accent-turquoise);
-        background: rgba(8, 145, 178, 0.09);
-      }
-
-      .lista {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        max-height: 50vh;
-        overflow-y: auto;
-        scrollbar-width: thin;
-      }
-
-      .lista-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 8px 10px;
-        border-radius: var(--radius-md);
-        background: rgba(15, 23, 42, 0.02);
-        border: 1px solid rgba(148, 163, 184, 0.4);
-        margin-bottom: 6px;
-      }
-
-      .lista-item.comprado {
-        background: rgba(22, 163, 74, 0.1);
-        border-color: rgba(22, 163, 74, 0.6);
-        color: #22c55e;
-      }
-
-      .item-esquerda {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        min-width: 0;
-      }
-
-      .item-esquerda span.nome {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 120px;
-      }
-
-      .item-direita {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 4px;
-      }
-
-      .badge-quantidade {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-        border-radius: 999px;
-        background: rgba(249, 115, 22, 0.1);
-        color: var(--accent-orange);
-      }
-
-      .badge-preco {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-        border-radius: 999px;
-        background: rgba(250, 204, 21, 0.12);
-        color: var(--accent-yellow);
-      }
-
-      .btn-pequeno {
-        padding: 4px 6px;
-        font-size: 0.7rem;
-      }
-
-      .btn-remover {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--accent-red);
-        border: 1px solid rgba(239, 68, 68, 0.4);
-      }
-
-      .btn-toggle {
-        background: rgba(56, 189, 248, 0.2);
-        color: var(--accent-turquoise);
-        border: 1px solid rgba(56, 189, 248, 0.7);
-      }
-
-      .btn-editar {
-        background: rgba(99, 102, 241, 0.12);
-        color: var(--accent-indigo);
-        border: 1px solid rgba(99, 102, 241, 0.6);
-      }
-
-      .mensagem-vazia {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        margin-top: 8px;
-      }
-
-      .rodape {
-        margin-top: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        font-size: 0.8rem;
-      }
-
-      .rodape-linha {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-      }
-
-      .resumo-info {
-        color: var(--text-muted);
-      }
-
-      .acoes-resumo {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-      }
-
-      .btn-texto {
-        background: transparent;
-        border: 1px dashed rgba(148, 163, 184, 0.7);
-        color: var(--text-muted);
-      }
-
-      .btn-total {
-        background: linear-gradient(
-          135deg,
-          var(--accent-yellow),
-          var(--accent-orange)
-        );
-        color: #111827;
-      }
-
-      .texto-total {
-        font-weight: 600;
-        color: var(--accent-green);
-      }
-
-      .importacao {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        font-size: 0.75rem;
-        color: var(--text-muted);
-      }
-
-      .importacao input[type="file"] {
-        font-size: 0.75rem;
-      }
-
-      @media (max-width: 360px) {
-        .form-row {
-          flex-direction: column;
+        :root {
+            /* Paleta de cores fornecida - ajustadas para melhor contraste */
+            --color1: #fea304; /* Laranja - usado como cor primária */
+            --color1-dark: #d48800; /* Versão mais escura para contraste */
+            --color2: #909320; /* Verde oliva */
+            --color2-dark: #6d7518; /* Versão mais escura */
+            --color3: #125a44; /* Verde escuro */
+            --color3-light: #1a7c5f; /* Versão mais clara para contraste */
+            --color4: #37192c; /* Roxo vinho */
+            --color4-light: #4d2438; /* Versão mais clara */
+            --color5: #220315; /* Vinho muito escuro - quase preto */
+            
+            /* Cores de texto para contraste */
+            --text-on-dark: #f8f9fa; /* Texto claro sobre fundos escuros */
+            --text-on-light: #220315; /* Texto escuro sobre fundos claros */
+            --text-muted-dark: #ced4da; /* Texto secundário sobre escuro */
+            --text-muted-light: #5a3e4c; /* Texto secundário sobre claro */
+            
+            /* Cores de fundo otimizadas */
+            --bg-light-primary: #ffffff;
+            --bg-light-secondary: #f8f9fa;
+            --bg-dark-primary: #0f0510; /* Mais escuro que color5 para melhor contraste */
+            --bg-dark-secondary: #1a0b1a;
+            
+            /* Gradientes com contraste otimizado */
+            --gradient-primary: linear-gradient(135deg, var(--color1), var(--color1-dark));
+            --gradient-secondary: linear-gradient(135deg, var(--color3), var(--color3-light));
+            --gradient-dark: linear-gradient(135deg, var(--color4), var(--color5));
+            --gradient-accent: linear-gradient(135deg, var(--color2), var(--color3));
+            
+            /* Tema claro - otimizado para contraste */
+            --bg-main-light: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            --bg-card-light: var(--bg-light-primary);
+            --text-main-light: var(--color5);
+            --text-muted-light: var(--color4);
+            --border-light: rgba(34, 3, 21, 0.2);
+            --shadow-light: 0 6px 20px rgba(34, 3, 21, 0.15);
+            --shadow-hover-light: 0 10px 30px rgba(254, 163, 4, 0.2);
+            
+            /* Tema escuro - otimizado para contraste */
+            --bg-main-dark: linear-gradient(135deg, var(--bg-dark-primary) 0%, var(--color5) 100%);
+            --bg-card-dark: var(--bg-dark-secondary);
+            --text-main-dark: var(--text-on-dark);
+            --text-muted-dark: var(--text-muted-dark);
+            --border-dark: rgba(254, 163, 4, 0.4);
+            --shadow-dark: 0 6px 20px rgba(0, 0, 0, 0.4);
+            --shadow-hover-dark: 0 10px 30px rgba(254, 163, 4, 0.3);
+            
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-      }
 
-      @media print {
+        html[data-theme="light"] {
+            --bg-main: var(--bg-main-light);
+            --bg-card: var(--bg-card-light);
+            --text-main: var(--text-main-light);
+            --text-muted: var(--text-muted-light);
+            --border: var(--border-light);
+            --shadow: var(--shadow-light);
+            --shadow-hover: var(--shadow-hover-light);
+        }
+
+        html[data-theme="dark"] {
+            --bg-main: var(--bg-main-dark);
+            --bg-card: var(--bg-card-dark);
+            --text-main: var(--text-main-dark);
+            --text-muted: var(--text-muted-dark);
+            --border: var(--border-dark);
+            --shadow: var(--shadow-dark);
+            --shadow-hover: var(--shadow-hover-dark);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         body {
-          background: #ffffff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: var(--bg-main);
+            color: var(--text-main);
+            transition: var(--transition);
+            overflow-x: hidden;
+            line-height: 1.6;
         }
+
         .app {
-          box-shadow: none;
-          margin: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-out;
         }
-        .header,
-        .form,
-        .rodape .acoes-resumo,
-        .importacao {
-          display: none !important;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Modal de confirmação personalizado */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--color1);
+            transform: translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient-primary);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color5);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        .modal-content {
+            margin-bottom: 30px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            border: 2px solid;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .modal-btn-cancel {
+            background: transparent;
+            color: var(--text-muted);
+            border-color: var(--border);
+        }
+
+        .modal-btn-cancel:hover {
+            background: rgba(55, 25, 44, 0.1);
+            border-color: var(--color1);
+            color: var(--color1);
+        }
+
+        .modal-btn-confirm {
+            background: var(--gradient-primary);
+            color: var(--color5);
+            border-color: var(--color1);
+            box-shadow: 0 4px 12px rgba(254, 163, 4, 0.3);
+        }
+
+        .modal-btn-confirm:hover {
+            background: var(--color1-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(254, 163, 4, 0.4);
+        }
+
+        .modal-btn-danger {
+            background: linear-gradient(135deg, #a83232, #5a1212);
+            color: white;
+            border-color: #a83232;
+            box-shadow: 0 4px 12px rgba(168, 50, 50, 0.3);
+        }
+
+        .modal-btn-danger:hover {
+            background: #c03939;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(168, 50, 50, 0.4);
+        }
+
+        /* Modal de entrada personalizado (para substituir prompt) */
+        .modal-input-group {
+            margin-bottom: 20px;
+        }
+
+        .modal-input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 0.9rem;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--color1);
+            box-shadow: 0 0 0 3px rgba(254, 163, 4, 0.2);
+        }
+
+        /* Modal de alerta personalizado */
+        .modal-alert-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--gradient-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        /* Estilos para o aplicativo principal */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-3px);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color5);
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(254, 163, 4, 0.4);
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .theme-toggle {
+            width: 50px;
+            height: 26px;
+            border-radius: 50px;
+            background: var(--color4);
+            border: 2px solid var(--color1);
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--color1);
+            left: 4px;
+            transition: var(--transition);
+        }
+
+        html[data-theme="dark"] .theme-toggle::after {
+            left: calc(100% - 22px);
+            background: var(--color2);
+        }
+
+        .theme-icon {
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+
+        .theme-icon.sun {
+            color: var(--color1);
+            margin-right: auto;
+        }
+
+        .theme-icon.moon {
+            color: var(--color2);
+            margin-left: auto;
+        }
+
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 20px;
+            background: rgba(55, 25, 44, 0.1);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--border);
+            transition: var(--transition);
+        }
+
+        .form:hover {
+            background: rgba(55, 25, 44, 0.15);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        label {
+            font-size: 0.8rem;
+            color: var(--text-main);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color1);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 12px 12px 12px 38px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--border);
+            outline: none;
+            background: var(--bg-card);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            width: 100%;
+            font-weight: 500;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: var(--color1);
+            box-shadow: 0 0 0 3px rgba(254, 163, 4, 0.2);
+        }
+
+        #btn-adicionar {
+            background: var(--gradient-primary);
+            color: var(--color5);
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 5px;
+            box-shadow: 0 4px 15px rgba(254, 163, 4, 0.4);
+            letter-spacing: 0.5px;
+        }
+
+        #btn-adicionar:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(254, 163, 4, 0.6);
+        }
+
+        #btn-adicionar:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .lista-container {
+            margin-top: 24px;
+        }
+
+        .lista-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .lista-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-main);
+        }
+
+        .filtros {
+            display: flex;
+            gap: 6px;
+            background: rgba(55, 25, 44, 0.1);
+            padding: 5px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .chip-filtro {
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .chip-filtro.ativo {
+            background: var(--color1);
+            color: var(--color5);
+            border-color: var(--color1);
+        }
+
+        .ordenacao-container {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        #ordenacao {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fea304' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            padding-right: 45px;
+            border: 2px solid var(--border);
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            font-weight: 500;
+        }
+
         .lista {
-          max-height: none;
-          overflow: visible;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 55vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--color1) transparent;
         }
-      }
+
+        .lista::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .lista::-webkit-scrollbar-track {
+            background: rgba(55, 25, 44, 0.1);
+            border-radius: 10px;
+        }
+
+        .lista::-webkit-scrollbar-thumb {
+            background: var(--color1);
+            border-radius: 10px;
+        }
+
+        .lista-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            margin-bottom: 10px;
+            transition: var(--transition);
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .lista-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            border-color: var(--color1);
+        }
+
+        .lista-item.comprado {
+            background: rgba(18, 90, 68, 0.15);
+            border-color: var(--color3);
+        }
+
+        .item-esquerda {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .item-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--color1);
+            background: var(--bg-card);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .lista-item.comprado .item-checkbox {
+            background: var(--color3);
+            border-color: var(--color3);
+        }
+
+        .item-checkbox i {
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .lista-item.comprado .item-checkbox i {
+            opacity: 1;
+        }
+
+        .item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .item-nome {
+            font-weight: 700;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text-main);
+        }
+
+        .lista-item.comprado .item-nome {
+            text-decoration: line-through;
+            color: var(--color3);
+        }
+
+        .item-detalhes {
+            display: flex;
+            gap: 10px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 2px solid;
+        }
+
+        .badge-quantidade {
+            background: rgba(254, 163, 4, 0.1);
+            color: var(--color1);
+            border-color: rgba(254, 163, 4, 0.3);
+        }
+
+        .badge-preco {
+            background: rgba(144, 147, 32, 0.1);
+            color: var(--color2);
+            border-color: rgba(144, 147, 32, 0.3);
+        }
+
+        .item-direita {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-acao {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 2px solid;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn-acao:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-editar {
+            background: var(--color1);
+            border-color: var(--color1);
+        }
+
+        .btn-toggle {
+            background: var(--color3);
+            border-color: var(--color3);
+        }
+
+        .btn-remover {
+            background: #a83232;
+            border-color: #a83232;
+        }
+
+        .mensagem-vazia {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mensagem-vazia i {
+            font-size: 2.5rem;
+            color: var(--color1);
+            opacity: 0.7;
+        }
+
+        .rodape {
+            margin-top: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .rodape-linha {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resumo-info {
+            color: var(--text-main);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .acoes-resumo {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-texto {
+            background: transparent;
+            border: 2px dashed var(--border);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-texto:hover {
+            background: rgba(55, 25, 44, 0.1);
+            border-style: solid;
+            border-color: var(--color1);
+        }
+
+        .total-container {
+            background: var(--gradient-dark);
+            padding: 18px;
+            border-radius: var(--radius-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            border: 2px solid var(--color1);
+        }
+
+        .btn-total {
+            background: var(--color1);
+            color: var(--color5);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(254, 163, 4, 0.4);
+        }
+
+        .btn-total:hover {
+            background: #ffb630;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(254, 163, 4, 0.6);
+        }
+
+        .texto-total {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--color1);
+        }
+
+        .importacao {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 16px;
+            border-top: 2px dashed var(--border);
+        }
+
+        .importacao label {
+            font-size: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .file-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--border);
+            background: var(--bg-card);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .file-input-wrapper:hover .file-input-display {
+            border-color: var(--color1);
+            background: rgba(55, 25, 44, 0.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--gradient-primary);
+            color: var(--color5);
+            padding: 14px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            font-weight: 800;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            max-width: 90%;
+            text-align: center;
+            border: 2px solid var(--color1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Controles de acessibilidade */
+        .accessibility-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .accessibility-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color1);
+            color: var(--color5);
+            border: 2px solid var(--color1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .accessibility-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 500px) {
+            .app {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .item-direita {
+                flex-direction: column;
+            }
+            
+            .btn-acao {
+                width: 32px;
+                height: 32px;
+            }
+            
+            .accessibility-controls {
+                bottom: 10px;
+                right: 10px;
+                flex-direction: column;
+            }
+            
+            .modal {
+                padding: 20px;
+                max-width: 100%;
+            }
+            
+            .modal-actions {
+                flex-direction: column;
+            }
+            
+            .modal-btn {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            body {
+                background: #ffffff !important;
+            }
+            
+            .app {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .card {
+                box-shadow: none;
+                border: 1px solid #000;
+            }
+            
+            .header,
+            .form,
+            .ordenacao-container,
+            .acoes-resumo,
+            .importacao,
+            .btn-acao,
+            .filtros,
+            .accessibility-controls,
+            .modal-overlay {
+                display: none !important;
+            }
+            
+            .lista {
+                max-height: none;
+                overflow: visible;
+            }
+            
+            .lista-item {
+                break-inside: avoid;
+                border: 1px solid #000 !important;
+                color: #000 !important;
+            }
+            
+            .item-nome {
+                color: #000 !important;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <main class="app">
-      <section class="card">
-        <header class="header">
-          <div class="header-title">
-            <div class="chip">
-              <span class="dot"></span>
-              Lista de Compras
-            </div>
-            <h1>
-              Mobile
-              <span
-                style="
-                  font-size: 0.75rem;
-                  font-weight: 500;
-                  color: var(--text-muted);
-                "
-                >organize tudo na mão</span
-              >
-            </h1>
-          </div>
-          <button id="btn-theme" class="theme-toggle">
-            <span>🌞</span> <span>Claro</span>
-          </button>
-        </header>
+        <section class="card">
+            <header class="header">
+                <div class="header-title">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-shopping-basket"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1>Lista de Compras</h1>
+                            <span class="subtitle">Confirmação Personalizada</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="theme-toggle" id="btn-theme">
+                    <span class="theme-icon sun"><i class="fas fa-sun"></i></span>
+                    <span class="theme-icon moon"><i class="fas fa-moon"></i></span>
+                </div>
+            </header>
 
-        <form id="form-compra" class="form">
-          <div class="form-group">
-            <label for="item-nome">Item</label>
-            <input
-              type="text"
-              id="item-nome"
-              placeholder="Ex.: Arroz integral"
-              autocomplete="off"
-            />
-          </div>
+            <form id="form-compra" class="form">
+                <div class="form-group">
+                    <label for="item-nome"><i class="fas fa-tag"></i> Item</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-pencil-alt input-icon"></i>
+                        <input type="text" id="item-nome" placeholder="O que você precisa comprar?" autocomplete="off" />
+                    </div>
+                </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="item-quantidade">Quantidade</label>
-              <input type="number" id="item-quantidade" min="1" value="1" />
-            </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="item-quantidade"><i class="fas fa-box"></i> Quantidade</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-hashtag input-icon"></i>
+                            <input type="number" id="item-quantidade" min="1" value="1" />
+                        </div>
+                    </div>
 
-            <div class="form-group">
-              <label for="item-preco">Preço (R$)</label>
-              <input
-                type="number"
-                id="item-preco"
-                min="0"
-                step="0.01"
-                value="0"
-              />
-            </div>
-          </div>
+                    <div class="form-group">
+                        <label for="item-preco"><i class="fas fa-dollar-sign"></i> Preço (R$)</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-money-bill-wave input-icon"></i>
+                            <input type="number" id="item-preco" min="0" step="0.01" value="0" />
+                        </div>
+                    </div>
+                </div>
 
-          <button type="submit" id="btn-adicionar">Adicionar item</button>
-        </form>
+                <button type="submit" id="btn-adicionar">
+                    <i class="fas fa-plus-circle"></i> Adicionar item
+                </button>
+            </form>
 
-        <section class="lista-container">
-          <div class="lista-header">
-            <h2>Itens</h2>
-            <div class="filtros">
-              <button
-                class="chip-filtro ativo"
-                data-filtro="todos"
-                type="button"
-              >
-                Todos
-              </button>
-              <button
-                class="chip-filtro"
-                data-filtro="pendentes"
-                type="button"
-              >
-                Pendentes
-              </button>
-              <button
-                class="chip-filtro"
-                data-filtro="comprados"
-                type="button"
-              >
-                Comprados
-              </button>
-            </div>
-          </div>
+            <section class="lista-container">
+                <div class="lista-header">
+                    <h2><i class="fas fa-list"></i> Itens da Lista</h2>
+                    <div class="filtros">
+                        <button class="chip-filtro ativo" data-filtro="todos" type="button">
+                            Todos
+                        </button>
+                        <button class="chip-filtro" data-filtro="pendentes" type="button">
+                            Pendentes
+                        </button>
+                        <button class="chip-filtro" data-filtro="comprados" type="button">
+                            Comprados
+                        </button>
+                    </div>
+                </div>
 
-          <select id="ordenacao">
-            <option value="data-desc">Mais recentes</option>
-            <option value="nome-asc">Nome (A-Z)</option>
-            <option value="nome-desc">Nome (Z-A)</option>
-            <option value="qtd-asc">Quantidade (↑)</option>
-            <option value="qtd-desc">Quantidade (↓)</option>
-            <option value="preco-asc">Preço (↑)</option>
-            <option value="preco-desc">Preço (↓)</option>
-          </select>
+                <div class="ordenacao-container">
+                    <select id="ordenacao">
+                        <option value="data-desc">Mais recentes</option>
+                        <option value="nome-asc">Nome (A-Z)</option>
+                        <option value="nome-desc">Nome (Z-A)</option>
+                        <option value="qtd-asc">Quantidade (↑)</option>
+                        <option value="qtd-desc">Quantidade (↓)</option>
+                        <option value="preco-asc">Preço (↑)</option>
+                        <option value="preco-desc">Preço (↓)</option>
+                    </select>
+                </div>
 
-          <ul id="lista-itens" class="lista"></ul>
-          <p id="mensagem-vazia" class="mensagem-vazia">
-            Nenhum item ainda. Comece adicionando algo acima.
-          </p>
+                <ul id="lista-itens" class="lista"></ul>
+                
+                <div id="mensagem-vazia" class="mensagem-vazia">
+                    <i class="fas fa-clipboard-list"></i>
+                    <p>Sua lista está vazia. Adicione itens para começar!</p>
+                </div>
+            </section>
+
+            <section class="rodape">
+                <div class="rodape-linha">
+                    <span id="texto-resumo" class="resumo-info">
+                        0 itens (0 pendentes, 0 comprados)
+                    </span>
+                    <div class="acoes-resumo">
+                        <button id="btn-limpar-comprados" class="btn-texto" type="button">
+                            <i class="fas fa-trash-alt"></i> Limpar comprados
+                        </button>
+                        <button id="btn-exportar-pdf" class="btn-texto" type="button">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="total-container">
+                    <button id="btn-calcular-total" class="btn-total" type="button">
+                        <i class="fas fa-calculator"></i> Calcular total
+                    </button>
+                    <span id="texto-total" class="texto-total">R$ 0,00</span>
+                </div>
+
+                <div class="importacao">
+                    <label for="input-importar"><i class="fas fa-file-import"></i> Importar lista</label>
+                    <div class="file-input-container">
+                        <div class="file-input-wrapper">
+                            <input type="file" id="input-importar" accept=".json" />
+                            <div class="file-input-display">
+                                <i class="fas fa-file-code"></i>
+                                <span id="file-name">Selecione um arquivo JSON</span>
+                            </div>
+                        </div>
+                        <button id="btn-importar" class="btn-texto" type="button">
+                            <i class="fas fa-upload"></i> Importar
+                        </button>
+                    </div>
+                </div>
+            </section>
         </section>
-
-        <section class="rodape">
-          <div class="rodape-linha">
-            <span id="texto-resumo" class="resumo-info">
-              0 itens (0 pendentes, 0 comprados)
-            </span>
-            <div class="acoes-resumo">
-              <button id="btn-limpar-comprados" class="btn-texto" type="button">
-                Limpar comprados
-              </button>
-              <button id="btn-exportar-pdf" class="btn-texto" type="button">
-                Exportar PDF
-              </button>
+        
+        <!-- Toast para mensagens gerais -->
+        <div id="toast" class="toast"></div>
+        
+        <!-- Controles de acessibilidade -->
+        <div class="accessibility-controls">
+            <button id="btn-increase-font" class="accessibility-btn" title="Aumentar tamanho da fonte">
+                <i class="fas fa-text-height"></i>
+            </button>
+            <button id="btn-decrease-font" class="accessibility-btn" title="Diminuir tamanho da fonte">
+                <i class="fas fa-text-width"></i>
+            </button>
+            <button id="btn-high-contrast" class="accessibility-btn" title="Alto contraste">
+                <i class="fas fa-adjust"></i>
+            </button>
+        </div>
+        
+        <!-- Modal de confirmação personalizado (substitui confirm()) -->
+        <div id="modal-confirm" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3 class="modal-title" id="modal-confirm-title">Confirmação</h3>
+                </div>
+                <div class="modal-content" id="modal-confirm-content">
+                    Tem certeza que deseja realizar esta ação?
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" id="modal-confirm-cancel">Cancelar</button>
+                    <button class="modal-btn modal-btn-confirm" id="modal-confirm-ok">Confirmar</button>
+                </div>
             </div>
-          </div>
-
-          <div class="rodape-linha">
-            <button
-              id="btn-calcular-total"
-              class="btn-total"
-              type="button"
-            >
-              Total dos pendentes
-            </button>
-            <span id="texto-total" class="texto-total"></span>
-          </div>
-
-          <div class="importacao">
-            <span>Importar lista JSON (nome, quantidade, preco, comprado)</span>
-            <input type="file" id="input-importar" accept=".json" />
-            <button id="btn-importar" class="btn-texto" type="button">
-              Importar JSON
-            </button>
-          </div>
-        </section>
-      </section>
+        </div>
+        
+        <!-- Modal de alerta personalizado (substitui alert()) -->
+        <div id="modal-alert" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <h3 class="modal-title" id="modal-alert-title">Informação</h3>
+                </div>
+                <div class="modal-content" id="modal-alert-content">
+                    Esta é uma mensagem de alerta.
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-confirm" id="modal-alert-ok">OK</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de entrada personalizado (substitui prompt()) -->
+        <div id="modal-prompt" class="modal-overlay">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3 class="modal-title" id="modal-prompt-title">Editar Item</h3>
+                </div>
+                <div class="modal-content">
+                    <div class="modal-input-group">
+                        <label class="modal-input-label" id="modal-prompt-label">Digite o novo valor:</label>
+                        <input type="text" class="modal-input" id="modal-prompt-input" autocomplete="off">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-cancel" id="modal-prompt-cancel">Cancelar</button>
+                    <button class="modal-btn modal-btn-confirm" id="modal-prompt-ok">Confirmar</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
-      const STORAGE_KEY = "lista-compras-mobile";
+        const STORAGE_KEY = "lista-compras-confirmacao";
 
-      /**
-       * @typedef {{id:number;nome:string;quantidade:number;preco:number;comprado:boolean;criadoEm:string;}} ItemLista
-       */
+        /**
+         * @typedef {{id:number;nome:string;quantidade:number;preco:number;comprado:boolean;criadoEm:string;}} ItemLista
+         */
 
-      /** @type {ItemLista[]} */
-      let itens = [];
+        /** @type {ItemLista[]} */
+        let itens = [];
 
-      const form = document.getElementById("form-compra");
-      const inputNome = document.getElementById("item-nome");
-      const inputQuantidade = document.getElementById("item-quantidade");
-      const inputPreco = document.getElementById("item-preco");
-      const btnAdicionar = document.getElementById("btn-adicionar");
-      const listaElement = document.getElementById("lista-itens");
-      const mensagemVazia = document.getElementById("mensagem-vazia");
-      const ordenacao = document.getElementById("ordenacao");
-      const textoResumo = document.getElementById("texto-resumo");
-      const btnLimparComprados = document.getElementById(
-        "btn-limpar-comprados"
-      );
-      const btnCalcularTotal = document.getElementById("btn-calcular-total");
-      const textoTotal = document.getElementById("texto-total");
-      const inputImportar = document.getElementById("input-importar");
-      const btnImportar = document.getElementById("btn-importar");
-      const btnExportarPDF = document.getElementById("btn-exportar-pdf");
-      const filtroChips = Array.from(
-        document.querySelectorAll(".chip-filtro")
-      );
-      const btnTheme = document.getElementById("btn-theme");
+        // Elementos do DOM
+        const form = document.getElementById("form-compra");
+        const inputNome = document.getElementById("item-nome");
+        const inputQuantidade = document.getElementById("item-quantidade");
+        const inputPreco = document.getElementById("item-preco");
+        const btnAdicionar = document.getElementById("btn-adicionar");
+        const listaElement = document.getElementById("lista-itens");
+        const mensagemVazia = document.getElementById("mensagem-vazia");
+        const ordenacao = document.getElementById("ordenacao");
+        const textoResumo = document.getElementById("texto-resumo");
+        const btnLimparComprados = document.getElementById("btn-limpar-comprados");
+        const btnCalcularTotal = document.getElementById("btn-calcular-total");
+        const textoTotal = document.getElementById("texto-total");
+        const inputImportar = document.getElementById("input-importar");
+        const btnImportar = document.getElementById("btn-importar");
+        const btnExportarPDF = document.getElementById("btn-exportar-pdf");
+        const filtroChips = Array.from(document.querySelectorAll(".chip-filtro"));
+        const btnTheme = document.getElementById("btn-theme");
+        const fileNameDisplay = document.getElementById("file-name");
+        const toast = document.getElementById("toast");
+        const btnIncreaseFont = document.getElementById("btn-increase-font");
+        const btnDecreaseFont = document.getElementById("btn-decrease-font");
+        const btnHighContrast = document.getElementById("btn-high-contrast");
 
-      let filtroAtual = "todos";
+        // Elementos dos modais personalizados
+        const modalConfirm = document.getElementById("modal-confirm");
+        const modalConfirmTitle = document.getElementById("modal-confirm-title");
+        const modalConfirmContent = document.getElementById("modal-confirm-content");
+        const modalConfirmCancel = document.getElementById("modal-confirm-cancel");
+        const modalConfirmOk = document.getElementById("modal-confirm-ok");
+        
+        const modalAlert = document.getElementById("modal-alert");
+        const modalAlertTitle = document.getElementById("modal-alert-title");
+        const modalAlertContent = document.getElementById("modal-alert-content");
+        const modalAlertOk = document.getElementById("modal-alert-ok");
+        
+        const modalPrompt = document.getElementById("modal-prompt");
+        const modalPromptTitle = document.getElementById("modal-prompt-title");
+        const modalPromptLabel = document.getElementById("modal-prompt-label");
+        const modalPromptInput = document.getElementById("modal-prompt-input");
+        const modalPromptCancel = document.getElementById("modal-prompt-cancel");
+        const modalPromptOk = document.getElementById("modal-prompt-ok");
 
-      function salvarNoStorage() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(itens));
-      }
+        let filtroAtual = "todos";
+        let editandoItemId = null;
+        let fontSize = 16;
+        let highContrastMode = false;
 
-      function carregarDoStorage() {
-        const bruto = localStorage.getItem(STORAGE_KEY);
-        if (!bruto) {
-          itens = [];
-          return;
-        }
-        try {
-          const dados = JSON.parse(bruto);
-          itens = Array.isArray(dados) ? dados : [];
-        } catch {
-          itens = [];
-        }
-      }
+        // Sistema de modais personalizados para substituir confirm(), alert() e prompt()
 
-      function aplicarFiltroEOrdenacao(lista) {
-        let resultado = [...lista];
-
-        if (filtroAtual === "pendentes") {
-          resultado = resultado.filter((i) => !i.comprado);
-        } else if (filtroAtual === "comprados") {
-          resultado = resultado.filter((i) => i.comprado);
-        }
-
-        const ord = ordenacao.value;
-        resultado.sort((a, b) => {
-          switch (ord) {
-            case "nome-asc":
-              return a.nome.localeCompare(b.nome);
-            case "nome-desc":
-              return b.nome.localeCompare(a.nome);
-            case "qtd-asc":
-              return a.quantidade - b.quantidade;
-            case "qtd-desc":
-              return b.quantidade - a.quantidade;
-            case "preco-asc":
-              return a.preco - b.preco;
-            case "preco-desc":
-              return b.preco - a.preco;
-            case "data-asc":
-              return new Date(a.criadoEm) - new Date(b.criadoEm);
-            case "data-desc":
-              return new Date(b.criadoEm) - new Date(a.criadoEm);
-            default:
-              return 0;
-          }
-        });
-
-        return resultado;
-      }
-
-      function atualizarResumo() {
-        const total = itens.length;
-        const comprados = itens.filter((i) => i.comprado).length;
-        const pendentes = total - comprados;
-        textoResumo.textContent = `${total} itens (${pendentes} pendentes, ${comprados} comprados)`;
-      }
-
-      function renderizarLista() {
-        listaElement.innerHTML = "";
-
-        const visiveis = aplicarFiltroEOrdenacao(itens);
-
-        mensagemVazia.style.display = visiveis.length ? "none" : "block";
-
-        visiveis.forEach((item) => {
-          const li = document.createElement("li");
-          li.className = "lista-item";
-          if (item.comprado) li.classList.add("comprado");
-
-          const esquerda = document.createElement("div");
-          esquerda.className = "item-esquerda";
-
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.checked = item.comprado;
-          checkbox.addEventListener("change", () => {
-            toggleComprado(item.id);
-          });
-
-          const spanNome = document.createElement("span");
-          spanNome.className = "nome";
-          spanNome.textContent = item.nome;
-
-          const badgeQtd = document.createElement("span");
-          badgeQtd.className = "badge-quantidade";
-          badgeQtd.textContent = `x${item.quantidade}`;
-
-          const badgePreco = document.createElement("span");
-          badgePreco.className = "badge-preco";
-          badgePreco.textContent = `R$ ${item.preco.toFixed(2)}`;
-
-          esquerda.appendChild(checkbox);
-          esquerda.appendChild(spanNome);
-          esquerda.appendChild(badgeQtd);
-          esquerda.appendChild(badgePreco);
-
-          const direita = document.createElement("div");
-          direita.className = "item-direita";
-
-          const btnEditar = document.createElement("button");
-          btnEditar.type = "button";
-          btnEditar.className = "btn-pequeno btn-editar";
-          btnEditar.textContent = "Editar";
-          btnEditar.addEventListener("click", () => {
-            editarItemInline(item.id);
-          });
-
-          const btnToggle = document.createElement("button");
-          btnToggle.type = "button";
-          btnToggle.className = "btn-pequeno btn-toggle";
-          btnToggle.textContent = item.comprado ? "Desm." : "Comprar";
-          btnToggle.addEventListener("click", () => {
-            toggleComprado(item.id);
-          });
-
-          const btnRemover = document.createElement("button");
-          btnRemover.type = "button";
-          btnRemover.className = "btn-pequeno btn-remover";
-          btnRemover.textContent = "X";
-          btnRemover.addEventListener("click", () => {
-            removerItem(item.id);
-          });
-
-          direita.appendChild(btnEditar);
-          direita.appendChild(btnToggle);
-          direita.appendChild(btnRemover);
-
-          li.appendChild(esquerda);
-          li.appendChild(direita);
-
-          listaElement.appendChild(li);
-        });
-
-        atualizarResumo();
-      }
-
-      function adicionarItem(nome, quantidade, preco) {
-        const novoItem = {
-          id: Date.now() + Math.random(),
-          nome,
-          quantidade,
-          preco,
-          comprado: false,
-          criadoEm: new Date().toISOString(),
-        };
-        itens.push(novoItem);
-        salvarNoStorage();
-        renderizarLista();
-      }
-
-      function toggleComprado(id) {
-        itens = itens.map((item) =>
-          item.id === id ? { ...item, comprado: !item.comprado } : item
-        );
-        salvarNoStorage();
-        renderizarLista();
-      }
-
-      function removerItem(id) {
-        itens = itens.filter((item) => item.id !== id);
-        salvarNoStorage();
-        renderizarLista();
-      }
-
-      function editarItemInline(id) {
-        const item = itens.find((i) => i.id === id);
-        if (!item) return;
-
-        const novoNome = prompt("Novo nome do item:", item.nome);
-        if (novoNome === null) return;
-        const novoNomeTrim = novoNome.trim();
-        if (!novoNomeTrim) return;
-
-        const novaQtdStr = prompt(
-          "Nova quantidade:",
-          String(item.quantidade)
-        );
-        if (novaQtdStr === null) return;
-        const novaQtd = Number(novaQtdStr);
-        if (Number.isNaN(novaQtd) || novaQtd < 1) return;
-
-        const novoPrecoStr = prompt(
-          "Novo preço (R$):",
-          item.preco.toFixed(2)
-        );
-        if (novoPrecoStr === null) return;
-        const novoPreco = Number(novoPrecoStr.replace(",", "."));
-        if (Number.isNaN(novoPreco) || novoPreco < 0) return;
-
-        itens = itens.map((i) =>
-          i.id === id
-            ? {
-                ...i,
-                nome: novoNomeTrim,
-                quantidade: novaQtd,
-                preco: novoPreco,
-              }
-            : i
-        );
-        salvarNoStorage();
-        renderizarLista();
-      }
-
-      function atualizarEstadoBotao() {
-        const nomeValido = inputNome.value.trim().length > 0;
-        const qtd = Number(inputQuantidade.value);
-        const qtdValida = !Number.isNaN(qtd) && qtd >= 1;
-        const preco = Number(inputPreco.value);
-        const precoValido = !Number.isNaN(preco) && preco >= 0;
-
-        btnAdicionar.disabled = !(nomeValido && qtdValida && precoValido);
-      }
-
-      function limparComprados() {
-        if (!confirm("Remover todos os itens marcados como comprados?")) return;
-        itens = itens.filter((i) => !i.comprado);
-        salvarNoStorage();
-        renderizarLista();
-        textoTotal.textContent = "";
-      }
-
-      function calcularTotalPendentes() {
-        if (
-          !confirm(
-            "Calcular o total apenas dos itens pendentes? (preços x quantidades)"
-          )
-        )
-          return;
-        const total = itens
-          .filter((i) => !i.comprado)
-          .reduce((acc, i) => acc + i.preco * i.quantidade, 0);
-        textoTotal.textContent = `R$ ${total.toFixed(2)}`;
-      }
-
-      function importarJSON() {
-        if (!inputImportar.files || inputImportar.files.length === 0) {
-          alert("Selecione um arquivo JSON primeiro.");
-          return;
-        }
-
-        const arquivo = inputImportar.files[0];
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          try {
-            const conteudo = reader.result;
-            const dados = JSON.parse(conteudo);
-
-            if (!Array.isArray(dados)) {
-              alert("Formato inválido: esperado um array de itens.");
-              return;
-            }
-
-            const novos = dados
-              .map((raw) => {
-                const nome = String(raw.nome || "").trim();
-                const quantidade = Number(raw.quantidade ?? 1);
-                const preco = Number(raw.preco ?? 0);
-                const comprado = Boolean(raw.comprado);
-
-                if (!nome || Number.isNaN(quantidade) || quantidade < 1) {
-                  return null;
-                }
-
-                return {
-                  id: Date.now() + Math.random(),
-                  nome,
-                  quantidade,
-                  preco:
-                    Number.isNaN(preco) || preco < 0 ? 0 : preco,
-                  comprado,
-                  criadoEm: new Date().toISOString(),
+        /**
+         * Mostra um modal de confirmação personalizado (substitui confirm())
+         * @param {string} message - Mensagem a ser exibida
+         * @param {string} title - Título do modal (opcional)
+         * @returns {Promise<boolean>} Promise que resolve com true se confirmado, false se cancelado
+         */
+        function showConfirmModal(message, title = "Confirmação") {
+            return new Promise((resolve) => {
+                modalConfirmTitle.textContent = title;
+                modalConfirmContent.textContent = message;
+                modalConfirm.classList.add("active");
+                
+                // Focar no botão de cancelar para facilitar navegação por teclado
+                setTimeout(() => modalConfirmCancel.focus(), 100);
+                
+                const handleConfirm = () => {
+                    cleanup();
+                    resolve(true);
                 };
-              })
-              .filter((x) => x !== null);
+                
+                const handleCancel = () => {
+                    cleanup();
+                    resolve(false);
+                };
+                
+                const handleKeyDown = (e) => {
+                    if (e.key === "Escape") {
+                        handleCancel();
+                    } else if (e.key === "Enter" && document.activeElement === modalConfirmOk) {
+                        handleConfirm();
+                    }
+                };
+                
+                const cleanup = () => {
+                    modalConfirm.classList.remove("active");
+                    modalConfirmOk.removeEventListener("click", handleConfirm);
+                    modalConfirmCancel.removeEventListener("click", handleCancel);
+                    document.removeEventListener("keydown", handleKeyDown);
+                };
+                
+                modalConfirmOk.addEventListener("click", handleConfirm);
+                modalConfirmCancel.addEventListener("click", handleCancel);
+                document.addEventListener("keydown", handleKeyDown);
+            });
+        }
 
-            if (novos.length === 0) {
-              alert("Nenhum item válido encontrado no arquivo.");
-              return;
+        /**
+         * Mostra um modal de alerta personalizado (substitui alert())
+         * @param {string} message - Mensagem a ser exibida
+         * @param {string} title - Título do modal (opcional)
+         * @returns {Promise<void>} Promise que resolve quando o usuário clica em OK
+         */
+        function showAlertModal(message, title = "Informação") {
+            return new Promise((resolve) => {
+                modalAlertTitle.textContent = title;
+                modalAlertContent.textContent = message;
+                modalAlert.classList.add("active");
+                
+                // Focar no botão OK para facilitar navegação por teclado
+                setTimeout(() => modalAlertOk.focus(), 100);
+                
+                const handleOk = () => {
+                    cleanup();
+                    resolve();
+                };
+                
+                const handleKeyDown = (e) => {
+                    if (e.key === "Escape" || e.key === "Enter") {
+                        handleOk();
+                    }
+                };
+                
+                const cleanup = () => {
+                    modalAlert.classList.remove("active");
+                    modalAlertOk.removeEventListener("click", handleOk);
+                    document.removeEventListener("keydown", handleKeyDown);
+                };
+                
+                modalAlertOk.addEventListener("click", handleOk);
+                document.addEventListener("keydown", handleKeyDown);
+            });
+        }
+
+        /**
+         * Mostra um modal de entrada personalizado (substitui prompt())
+         * @param {string} message - Mensagem a ser exibida
+         * @param {string} defaultValue - Valor padrão do campo de entrada
+         * @param {string} title - Título do modal (opcional)
+         * @returns {Promise<string|null>} Promise que resolve com o valor digitado ou null se cancelado
+         */
+        function showPromptModal(message, defaultValue = "", title = "Entrada") {
+            return new Promise((resolve) => {
+                modalPromptTitle.textContent = title;
+                modalPromptLabel.textContent = message;
+                modalPromptInput.value = defaultValue;
+                modalPrompt.classList.add("active");
+                
+                // Focar no campo de entrada e selecionar todo o texto
+                setTimeout(() => {
+                    modalPromptInput.focus();
+                    modalPromptInput.select();
+                }, 100);
+                
+                const handleConfirm = () => {
+                    const value = modalPromptInput.value.trim();
+                    cleanup();
+                    resolve(value);
+                };
+                
+                const handleCancel = () => {
+                    cleanup();
+                    resolve(null);
+                };
+                
+                const handleKeyDown = (e) => {
+                    if (e.key === "Escape") {
+                        handleCancel();
+                    } else if (e.key === "Enter") {
+                        handleConfirm();
+                    }
+                };
+                
+                const cleanup = () => {
+                    modalPrompt.classList.remove("active");
+                    modalPromptOk.removeEventListener("click", handleConfirm);
+                    modalPromptCancel.removeEventListener("click", handleCancel);
+                    document.removeEventListener("keydown", handleKeyDown);
+                };
+                
+                modalPromptOk.addEventListener("click", handleConfirm);
+                modalPromptCancel.addEventListener("click", handleCancel);
+                document.addEventListener("keydown", handleKeyDown);
+            });
+        }
+
+        // Sistema de notificações toast
+        function mostrarToast(mensagem, tipo = "info") {
+            toast.textContent = mensagem;
+            toast.className = "toast";
+            
+            // Ajustar cor do toast baseado no tipo
+            if (tipo === "sucesso") {
+                toast.style.background = "linear-gradient(135deg, #909320, #125a44)";
+                toast.style.color = "#ffffff";
+            } else if (tipo === "erro") {
+                toast.style.background = "linear-gradient(135deg, #a83232, #5a1212)";
+                toast.style.color = "#ffffff";
+            } else if (tipo === "aviso") {
+                toast.style.background = "linear-gradient(135deg, #fea304, #d48800)";
+                toast.style.color = "#220315";
             }
+            
+            toast.classList.add("show");
+            
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
 
-            const substituir = confirm(
-              "Deseja substituir a lista atual pelos itens importados? (OK = substituir, Cancelar = adicionar aos existentes)"
-            );
+        // Ajustar tamanho da fonte
+        function ajustarTamanhoFonte(incremento) {
+            fontSize += incremento;
+            // Limitar tamanho entre 12px e 24px
+            if (fontSize < 12) fontSize = 12;
+            if (fontSize > 24) fontSize = 24;
+            
+            document.documentElement.style.fontSize = `${fontSize}px`;
+            mostrarToast(`Tamanho da fonte: ${fontSize}px`, "sucesso");
+        }
 
-            if (substituir) {
-              itens = novos;
+        // Alternar modo alto contraste
+        function alternarAltoContraste() {
+            highContrastMode = !highContrastMode;
+            
+            if (highContrastMode) {
+                document.body.classList.add("high-contrast-mode");
+                mostrarToast("Modo alto contraste ativado", "sucesso");
             } else {
-              itens = itens.concat(novos);
+                document.body.classList.remove("high-contrast-mode");
+                mostrarToast("Modo alto contraste desativado", "sucesso");
+            }
+            
+            // Salvar preferência
+            localStorage.setItem("lista-compras-alto-contraste", highContrastMode);
+        }
+
+        // Carregar e salvar dados
+        function salvarNoStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(itens));
+        }
+
+        function carregarDoStorage() {
+            const bruto = localStorage.getItem(STORAGE_KEY);
+            if (!bruto) {
+                itens = [];
+                return;
+            }
+            try {
+                const dados = JSON.parse(bruto);
+                itens = Array.isArray(dados) ? dados : [];
+            } catch {
+                itens = [];
+                mostrarToast("Erro ao carregar dados salvos", "erro");
+            }
+        }
+
+        // Aplicar filtros e ordenação
+        function aplicarFiltroEOrdenacao(lista) {
+            let resultado = [...lista];
+
+            if (filtroAtual === "pendentes") {
+                resultado = resultado.filter((i) => !i.comprado);
+            } else if (filtroAtual === "comprados") {
+                resultado = resultado.filter((i) => i.comprado);
             }
 
+            const ord = ordenacao.value;
+            resultado.sort((a, b) => {
+                switch (ord) {
+                    case "nome-asc":
+                        return a.nome.localeCompare(b.nome);
+                    case "nome-desc":
+                        return b.nome.localeCompare(a.nome);
+                    case "qtd-asc":
+                        return a.quantidade - b.quantidade;
+                    case "qtd-desc":
+                        return b.quantidade - a.quantidade;
+                    case "preco-asc":
+                        return a.preco - b.preco;
+                    case "preco-desc":
+                        return b.preco - a.preco;
+                    case "data-asc":
+                        return new Date(a.criadoEm) - new Date(b.criadoEm);
+                    case "data-desc":
+                    default:
+                        return new Date(b.criadoEm) - new Date(a.criadoEm);
+                }
+            });
+
+            return resultado;
+        }
+
+        // Atualizar resumo
+        function atualizarResumo() {
+            const total = itens.length;
+            const comprados = itens.filter((i) => i.comprado).length;
+            const pendentes = total - comprados;
+            textoResumo.textContent = `${total} itens (${pendentes} pendentes, ${comprados} comprados)`;
+        }
+
+        // Renderizar lista
+        function renderizarLista() {
+            listaElement.innerHTML = "";
+
+            const visiveis = aplicarFiltroEOrdenacao(itens);
+
+            mensagemVazia.style.display = visiveis.length ? "none" : "flex";
+
+            visiveis.forEach((item) => {
+                const li = document.createElement("li");
+                li.className = "lista-item";
+                if (item.comprado) li.classList.add("comprado");
+
+                const esquerda = document.createElement("div");
+                esquerda.className = "item-esquerda";
+
+                const checkboxContainer = document.createElement("div");
+                checkboxContainer.className = "item-checkbox";
+                checkboxContainer.addEventListener("click", () => {
+                    toggleComprado(item.id);
+                });
+
+                const checkIcon = document.createElement("i");
+                checkIcon.className = "fas fa-check";
+                checkboxContainer.appendChild(checkIcon);
+
+                const infoContainer = document.createElement("div");
+                infoContainer.className = "item-info";
+
+                const nomeElement = document.createElement("div");
+                nomeElement.className = "item-nome";
+                nomeElement.textContent = item.nome;
+
+                const detalhesContainer = document.createElement("div");
+                detalhesContainer.className = "item-detalhes";
+
+                const badgeQtd = document.createElement("div");
+                badgeQtd.className = "badge badge-quantidade";
+                badgeQtd.innerHTML = `<i class="fas fa-box"></i> ${item.quantidade}`;
+
+                const badgePreco = document.createElement("div");
+                badgePreco.className = "badge badge-preco";
+                badgePreco.innerHTML = `<i class="fas fa-dollar-sign"></i> ${item.preco.toFixed(2)}`;
+
+                detalhesContainer.appendChild(badgeQtd);
+                detalhesContainer.appendChild(badgePreco);
+
+                infoContainer.appendChild(nomeElement);
+                infoContainer.appendChild(detalhesContainer);
+
+                esquerda.appendChild(checkboxContainer);
+                esquerda.appendChild(infoContainer);
+
+                const direita = document.createElement("div");
+                direita.className = "item-direita";
+
+                const btnEditar = document.createElement("button");
+                btnEditar.type = "button";
+                btnEditar.className = "btn-acao btn-editar";
+                btnEditar.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEditar.title = "Editar item";
+                btnEditar.addEventListener("click", async () => {
+                    await editarItemInline(item.id);
+                });
+
+                const btnToggle = document.createElement("button");
+                btnToggle.type = "button";
+                btnToggle.className = "btn-acao btn-toggle";
+                btnToggle.innerHTML = item.comprado ? '<i class="fas fa-undo"></i>' : '<i class="fas fa-check"></i>';
+                btnToggle.title = item.comprado ? "Marcar como pendente" : "Marcar como comprado";
+                btnToggle.addEventListener("click", () => {
+                    toggleComprado(item.id);
+                });
+
+                const btnRemover = document.createElement("button");
+                btnRemover.type = "button";
+                btnRemover.className = "btn-acao btn-remover";
+                btnRemover.innerHTML = '<i class="fas fa-trash-alt"></i>';
+                btnRemover.title = "Remover item";
+                btnRemover.addEventListener("click", async () => {
+                    await removerItem(item.id);
+                });
+
+                direita.appendChild(btnEditar);
+                direita.appendChild(btnToggle);
+                direita.appendChild(btnRemover);
+
+                li.appendChild(esquerda);
+                li.appendChild(direita);
+
+                listaElement.appendChild(li);
+            });
+
+            atualizarResumo();
+        }
+
+        // Adicionar item
+        function adicionarItem(nome, quantidade, preco) {
+            // Se estiver editando, atualizar item existente
+            if (editandoItemId !== null) {
+                itens = itens.map((item) =>
+                    item.id === editandoItemId
+                        ? { ...item, nome, quantidade, preco }
+                        : item
+                );
+                editandoItemId = null;
+                btnAdicionar.innerHTML = '<i class="fas fa-plus-circle"></i> Adicionar item';
+                mostrarToast("Item atualizado com sucesso!", "sucesso");
+            } else {
+                // Adicionar novo item
+                const novoItem = {
+                    id: Date.now() + Math.random(),
+                    nome,
+                    quantidade,
+                    preco,
+                    comprado: false,
+                    criadoEm: new Date().toISOString(),
+                };
+                itens.push(novoItem);
+                mostrarToast("Item adicionado com sucesso!", "sucesso");
+            }
+            
             salvarNoStorage();
             renderizarLista();
-            textoTotal.textContent = "";
-            alert(`Importados ${novos.length} itens.`);
-          } catch (e) {
-            alert("Erro ao ler o arquivo. Verifique se é JSON válido.");
-          }
-        };
-
-        reader.readAsText(arquivo, "utf-8");
-      }
-
-      function alternarTema() {
-        const html = document.documentElement;
-        const temaAtual = html.getAttribute("data-theme") || "light";
-        const novoTema = temaAtual === "light" ? "dark" : "light";
-        html.setAttribute("data-theme", novoTema);
-
-        if (novoTema === "light") {
-          btnTheme.innerHTML = "<span>🌞</span> <span>Claro</span>";
-        } else {
-          btnTheme.innerHTML = "<span>🌙</span> <span>Escuro</span>";
         }
-      }
 
-      function exportarPDF() {
-        if (!confirm("Gerar versão em PDF da lista atual?")) return;
-        window.print();
-      }
+        // Alternar status de comprado
+        function toggleComprado(id) {
+            const item = itens.find((i) => i.id === id);
+            if (!item) return;
+            
+            itens = itens.map((item) =>
+                item.id === id ? { ...item, comprado: !item.comprado } : item
+            );
+            salvarNoStorage();
+            renderizarLista();
+            
+            const status = itens.find((i) => i.id === id).comprado ? "comprado" : "pendente";
+            mostrarToast(`Item marcado como ${status}`, "sucesso");
+        }
 
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const nome = inputNome.value.trim();
-        const quantidade = Number(inputQuantidade.value);
-        const preco = Number(inputPreco.value);
-        if (!nome || Number.isNaN(quantidade) || quantidade < 1) return;
-        if (Number.isNaN(preco) || preco < 0) return;
+        // Remover item
+        async function removerItem(id) {
+            const confirmado = await showConfirmModal(
+                "Tem certeza que deseja remover este item da lista?",
+                "Remover Item"
+            );
+            
+            if (!confirmado) return;
+            
+            itens = itens.filter((item) => item.id !== id);
+            salvarNoStorage();
+            renderizarLista();
+            mostrarToast("Item removido com sucesso!", "sucesso");
+            textoTotal.textContent = "R$ 0,00";
+        }
 
-        adicionarItem(nome, quantidade, preco);
-        inputNome.value = "";
-        inputQuantidade.value = "1";
-        inputPreco.value = "0";
-        inputNome.focus();
-        textoTotal.textContent = "";
-        atualizarEstadoBotao();
-      });
+        // Editar item inline
+        async function editarItemInline(id) {
+            const item = itens.find((i) => i.id === id);
+            if (!item) return;
 
-      inputNome.addEventListener("input", atualizarEstadoBotao);
-      inputQuantidade.addEventListener("input", atualizarEstadoBotao);
-      inputPreco.addEventListener("input", atualizarEstadoBotao);
-      ordenacao.addEventListener("change", renderizarLista);
+            // Usar prompt personalizado para o nome
+            const novoNome = await showPromptModal(
+                "Novo nome do item:",
+                item.nome,
+                "Editar Nome do Item"
+            );
+            
+            if (novoNome === null) return;
+            if (!novoNome.trim()) {
+                await showAlertModal("O nome do item não pode ficar vazio.", "Aviso");
+                return;
+            }
 
-      filtroChips.forEach((chip) => {
-        chip.addEventListener("click", () => {
-          filtroChips.forEach((c) => c.classList.remove("ativo"));
-          chip.classList.add("ativo");
-          filtroAtual = chip.getAttribute("data-filtro") || "todos";
-          renderizarLista();
-        });
-      });
+            // Usar prompt personalizado para a quantidade
+            const novaQtdStr = await showPromptModal(
+                "Nova quantidade:",
+                String(item.quantidade),
+                "Editar Quantidade"
+            );
+            
+            if (novaQtdStr === null) return;
+            const novaQtd = Number(novaQtdStr);
+            if (Number.isNaN(novaQtd) || novaQtd < 1) {
+                await showAlertModal("Quantidade inválida. Deve ser um número maior que zero.", "Aviso");
+                return;
+            }
 
-      btnLimparComprados.addEventListener("click", limparComprados);
-      btnCalcularTotal.addEventListener("click", calcularTotalPendentes);
-      btnImportar.addEventListener("click", (e) => {
-        e.preventDefault();
-        importarJSON();
-      });
-      btnExportarPDF.addEventListener("click", exportarPDF);
-      btnTheme.addEventListener("click", alternarTema);
+            // Usar prompt personalizado para o preço
+            const novoPrecoStr = await showPromptModal(
+                "Novo preço (R$):",
+                item.preco.toFixed(2),
+                "Editar Preço"
+            );
+            
+            if (novoPrecoStr === null) return;
+            const novoPreco = Number(novoPrecoStr.replace(",", "."));
+            if (Number.isNaN(novoPreco) || novoPreco < 0) {
+                await showAlertModal("Preço inválido. Deve ser um número maior ou igual a zero.", "Aviso");
+                return;
+            }
 
-      carregarDoStorage();
-      renderizarLista();
-      atualizarEstadoBotao();
+            itens = itens.map((i) =>
+                i.id === id
+                    ? {
+                        ...i,
+                        nome: novoNome.trim(),
+                        quantidade: novaQtd,
+                        preco: novoPreco,
+                    }
+                    : i
+            );
+            salvarNoStorage();
+            renderizarLista();
+            mostrarToast("Item atualizado com sucesso!", "sucesso");
+        }
+
+        // Atualizar estado do botão de adicionar
+        function atualizarEstadoBotao() {
+            const nomeValido = inputNome.value.trim().length > 0;
+            const qtd = Number(inputQuantidade.value);
+            const qtdValida = !Number.isNaN(qtd) && qtd >= 1;
+            const preco = Number(inputPreco.value);
+            const precoValido = !Number.isNaN(preco) && preco >= 0;
+
+            btnAdicionar.disabled = !(nomeValido && qtdValida && precoValido);
+        }
+
+        // Limpar itens comprados
+        async function limparComprados() {
+            const comprados = itens.filter((i) => i.comprado).length;
+            if (comprados === 0) {
+                await showAlertModal("Não há itens comprados para limpar.", "Aviso");
+                return;
+            }
+            
+            const confirmado = await showConfirmModal(
+                `Remover ${comprados} item(ns) marcado(s) como comprado(s)? Esta ação não pode ser desfeita.`,
+                "Limpar Itens Comprados"
+            );
+            
+            if (!confirmado) return;
+            
+            itens = itens.filter((i) => !i.comprado);
+            salvarNoStorage();
+            renderizarLista();
+            textoTotal.textContent = "R$ 0,00";
+            mostrarToast(`${comprados} item(ns) comprado(s) removido(s)`, "sucesso");
+        }
+
+        // Calcular total dos pendentes
+        async function calcularTotalPendentes() {
+            const pendentes = itens.filter((i) => !i.comprado);
+            if (pendentes.length === 0) {
+                await showAlertModal("Não há itens pendentes para calcular.", "Aviso");
+                textoTotal.textContent = "R$ 0,00";
+                return;
+            }
+            
+            const confirmado = await showConfirmModal(
+                "Calcular o total apenas dos itens pendentes? (preços x quantidades)",
+                "Calcular Total"
+            );
+            
+            if (!confirmado) return;
+            
+            const total = pendentes.reduce((acc, i) => acc + i.preco * i.quantidade, 0);
+            textoTotal.textContent = `R$ ${total.toFixed(2)}`;
+            mostrarToast(`Total dos ${pendentes.length} item(ns) pendentes: R$ ${total.toFixed(2)}`, "sucesso");
+        }
+
+        // Importar JSON
+        async function importarJSON() {
+            if (!inputImportar.files || inputImportar.files.length === 0) {
+                await showAlertModal("Selecione um arquivo JSON primeiro.", "Aviso");
+                return;
+            }
+
+            const arquivo = inputImportar.files[0];
+            const reader = new FileReader();
+
+            reader.onload = async () => {
+                try {
+                    const conteudo = reader.result;
+                    const dados = JSON.parse(conteudo);
+
+                    if (!Array.isArray(dados)) {
+                        await showAlertModal("Formato inválido: esperado um array de itens.", "Erro");
+                        return;
+                    }
+
+                    const novos = dados
+                        .map((raw, index) => {
+                            const nome = String(raw.nome || "").trim();
+                            const quantidade = Number(raw.quantidade ?? 1);
+                            const preco = Number(raw.preco ?? 0);
+                            const comprado = Boolean(raw.comprado);
+
+                            if (!nome) {
+                                console.warn(`Item ${index} ignorado: nome vazio`);
+                                return null;
+                            }
+
+                            if (Number.isNaN(quantidade) || quantidade < 1) {
+                                console.warn(`Item "${nome}" ignorado: quantidade inválida`);
+                                return null;
+                            }
+
+                            return {
+                                id: Date.now() + Math.random() + index,
+                                nome,
+                                quantidade,
+                                preco: Number.isNaN(preco) || preco < 0 ? 0 : preco,
+                                comprado,
+                                criadoEm: new Date().toISOString(),
+                            };
+                        })
+                        .filter((x) => x !== null);
+
+                    if (novos.length === 0) {
+                        await showAlertModal("Nenhum item válido encontrado no arquivo.", "Erro");
+                        return;
+                    }
+
+                    const substituir = await showConfirmModal(
+                        `Encontrados ${novos.length} item(ns) válido(s). Deseja substituir a lista atual pelos itens importados? (Cancelar = adicionar aos existentes)`,
+                        "Importar Lista"
+                    );
+
+                    if (substituir) {
+                        itens = novos;
+                        mostrarToast(`Lista substituída com ${novos.length} itens importados`, "sucesso");
+                    } else {
+                        itens = itens.concat(novos);
+                        mostrarToast(`${novos.length} itens adicionados à lista existente`, "sucesso");
+                    }
+
+                    salvarNoStorage();
+                    renderizarLista();
+                    textoTotal.textContent = "R$ 0,00";
+                    
+                    // Limpar input de arquivo
+                    inputImportar.value = "";
+                    fileNameDisplay.textContent = "Selecione um arquivo JSON";
+                } catch (e) {
+                    await showAlertModal("Erro ao ler o arquivo. Verifique se é JSON válido.", "Erro");
+                    console.error(e);
+                }
+            };
+
+            reader.readAsText(arquivo, "utf-8");
+        }
+
+        // Alternar tema claro/escuro
+        function alternarTema() {
+            const html = document.documentElement;
+            const temaAtual = html.getAttribute("data-theme") || "light";
+            const novoTema = temaAtual === "light" ? "dark" : "light";
+            html.setAttribute("data-theme", novoTema);
+            
+            // Salvar preferência
+            localStorage.setItem("lista-compras-tema", novoTema);
+            
+            mostrarToast(novoTema === "light" ? "Tema claro ativado" : "Tema escuro ativado", "sucesso");
+        }
+
+        // Exportar PDF (usando print)
+        async function exportarPDF() {
+            if (itens.length === 0) {
+                await showAlertModal("A lista está vazia. Adicione itens antes de exportar.", "Aviso");
+                return;
+            }
+            
+            const confirmado = await showConfirmModal(
+                "Gerar versão em PDF da lista atual? A lista será formatada para impressão.",
+                "Exportar PDF"
+            );
+            
+            if (!confirmado) return;
+            
+            window.print();
+            mostrarToast("Preparando lista para impressão/PDF...", "sucesso");
+        }
+
+        // Inicialização
+        function init() {
+            // Carregar tema salvo
+            const temaSalvo = localStorage.getItem("lista-compras-tema");
+            if (temaSalvo) {
+                document.documentElement.setAttribute("data-theme", temaSalvo);
+            }
+            
+            // Carregar modo alto contraste
+            const contrasteSalvo = localStorage.getItem("lista-compras-alto-contraste");
+            if (contrasteSalvo === "true") {
+                highContrastMode = true;
+                document.body.classList.add("high-contrast-mode");
+            }
+            
+            // Carregar dados
+            carregarDoStorage();
+            renderizarLista();
+            atualizarEstadoBotao();
+            
+            // Configurar eventos
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+                const nome = inputNome.value.trim();
+                const quantidade = Number(inputQuantidade.value);
+                const preco = Number(inputPreco.value);
+                
+                if (!nome || Number.isNaN(quantidade) || quantidade < 1) {
+                    showAlertModal("Preencha todos os campos corretamente", "Erro");
+                    return;
+                }
+                
+                if (Number.isNaN(preco) || preco < 0) {
+                    showAlertModal("Preço inválido", "Erro");
+                    return;
+                }
+
+                adicionarItem(nome, quantidade, preco);
+                
+                // Resetar formulário (exceto se estiver editando)
+                if (editandoItemId === null) {
+                    inputNome.value = "";
+                    inputQuantidade.value = "1";
+                    inputPreco.value = "0";
+                }
+                
+                inputNome.focus();
+                textoTotal.textContent = "R$ 0,00";
+                atualizarEstadoBotao();
+            });
+
+            inputNome.addEventListener("input", atualizarEstadoBotao);
+            inputQuantidade.addEventListener("input", atualizarEstadoBotao);
+            inputPreco.addEventListener("input", atualizarEstadoBotao);
+            ordenacao.addEventListener("change", renderizarLista);
+
+            filtroChips.forEach((chip) => {
+                chip.addEventListener("click", () => {
+                    filtroChips.forEach((c) => c.classList.remove("ativo"));
+                    chip.classList.add("ativo");
+                    filtroAtual = chip.getAttribute("data-filtro") || "todos";
+                    renderizarLista();
+                });
+            });
+
+            btnLimparComprados.addEventListener("click", limparComprados);
+            btnCalcularTotal.addEventListener("click", calcularTotalPendentes);
+            
+            btnImportar.addEventListener("click", (e) => {
+                e.preventDefault();
+                importarJSON();
+            });
+            
+            inputImportar.addEventListener("change", function() {
+                if (this.files.length > 0) {
+                    fileNameDisplay.textContent = this.files[0].name;
+                } else {
+                    fileNameDisplay.textContent = "Selecione um arquivo JSON";
+                }
+            });
+            
+            btnExportarPDF.addEventListener("click", exportarPDF);
+            btnTheme.addEventListener("click", alternarTema);
+            
+            // Controles de acessibilidade
+            btnIncreaseFont.addEventListener("click", () => ajustarTamanhoFonte(1));
+            btnDecreaseFont.addEventListener("click", () => ajustarTamanhoFonte(-1));
+            btnHighContrast.addEventListener("click", alternarAltoContraste);
+            
+            // Mostrar mensagem de boas-vindas
+            setTimeout(() => {
+                if (itens.length === 0) {
+                    mostrarToast("Bem-vindo à Lista de Compras com confirmação personalizada!", "sucesso");
+                }
+            }, 1000);
+        }
+
+        // Inicializar o app quando a página carregar
+        document.addEventListener("DOMContentLoaded", init);
     </script>
-  </body>
+</body>
 </html>
-
